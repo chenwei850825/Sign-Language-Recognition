@@ -1,0 +1,26 @@
+主程式: pipeline_i3d.py
+
+架構流程: 
+切割影片為訓練用的frame(frame.py: videosDir2framesDir)       => 
+計算光流(opticalflow.py: framesDir2flowsDir)                 => 
+神經網路訓練(train_i3d.py: train_I3D_oflow_end2end)          => 
+測試集模型運行結果(predict_test.py)                          => 
+應用到live demo中(livedemo.py)
+
+
+使用流程:
+Step1 (準備影片檔資料集)
+準備訓練用的影片檔資料夾，並將同一label的影片分類放置在同一label名稱子資料夾下。
+在pipeline_i3d.py中設定diVideoSet，分別設定影片資料夾名稱(sName)、總label個數種類(nClasses)、影片歸一化的frame長度(nFramesNorm)、影片歸一化的縮放短邊(nMinDim)、其餘維持不動即可。
+
+Step2 (影片檔資料集前處理)
+透過(bImage)、(bOflow) flag設置是否要將影片轉換成frames並將結果存至sImageDir資料夾中、以及計算光流並將結果存至sOflowDir資料夾中，若已有結果則會略過。
+
+Step3 (3D卷積神經網路訓練)
+訓練時可以選擇(train_I3D_rgb_end2end)、(train_I3D_oflow_end2end)、(train_I3D_combined_end2end)分別代表單純輸入image frame、單純輸入光流、輸入image frame以及光流給3D卷積神經網路訓練。
+
+Step4 (測試集模型運行)
+在predict_test.py中預測模型在測試集上的運行結果，透過(sModelFile)設置要使用的model file、(input_type)設置輸出檔案名稱、(select_gen)設置單純輸入image frame、單純輸入光流、輸入image frame以及光流以去預測: 需要與Step 3訓練時以及(sModelFile)的設置相符合。
+
+Step5 (live demo)
+(sModelFile)設置模型file、(diVideoSet)設置裝置camera在demo時的設定如長寬(h/w)、影片擷取時間(fDurationAvg)、影片fps(nFpsAvg)
